@@ -2,10 +2,11 @@ import sqlite3
 
 def create_tables():
     conn = sqlite3.connect('database.db')
+    conn.execute('PRAGMA foreign_keys = ON;')  # Habilitar claves foráneas
     cursor = conn.cursor()
 
-    -- Crear tabla de socios
-    cursor.execute('''
+    #Crear tabla de socios
+    cursor.executescript('''
         CREATE TABLE IF NOT EXISTS socios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
@@ -17,7 +18,7 @@ def create_tables():
         )
     ''')
 
-    -- Crear tabla de membresías
+    # Crear tabla de membresías
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS memberships (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,4 +43,8 @@ def create_tables():
 
     conn.commit()
     conn.close()
+    
+if __name__ == "__main__":
+        create_tables() 
+        print("Tablas creadas correctamente en la base de datos.")
 
