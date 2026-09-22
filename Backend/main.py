@@ -24,6 +24,8 @@ class Socio(BaseModel):
 def inicio():
     return {"mensaje": "Sistema de gimnasio funcionando correctamente."}
 
+
+###PARTE QUE MANEJA LOS DATOS DE SOCIOS-----------------------
 #Agregar socio nuevo
 @app.post("/socios")
 def crear_socio(socio: Socio):
@@ -170,5 +172,142 @@ def eliminar_socio(socio_id: int):
     return {
         "Mensaje": "Socio eliminado correctamente.",
         "id": socio_id
+    }
+    
+    
+###PARTE QUE MANEJA LA PARTE DE MEMBRESIAS
+class Membresia(BaseModel):
+    socio_id: int
+    tipo : str
+    fecha_inicio: str
+    fecha_vencimiento: str 
+    precio: float
+    estado: str = "activa"
+    
+@app.post("/membresias")
+def crear_membresia(membresia: Membresia):
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "SELECT FROM socio WHERE id = ?",
+        (membresia.socio_id,)
+    )
+    
+    socio = cursor.fetchone()
+        
+    if socio is None:
+        conn.close()
+        
+        raise HTTPException(
+            status_code=404,
+            detail= "El socio no existe"
+        )
+    
+    #Registrar la membresia
+    cursor.execute(
+        """
+        INSERT INTO membresias(
+            socio_id,
+            tipo,
+            fecha_inicio,
+            fecha_vencimiento,
+            precio,
+            estado
+        )
+        VALUES (?,?,?,?,?,?)
+        """,
+        (membresia.socio_id,
+        membresia.tipo,
+        membresia.fecha_inicio,
+        membresia.fecha_vencimiento,
+        membresia.precio,
+        membresia.estado
+        )
+        
+    conn.commit()
+    
+    membresia_id = cursor.lastrowid
+    
+    conn.close()
+    
+    return {
+        "Mensaje": "Membresia registrada correctamente.",
+        "id": membresia_id,
+        "socio_id": membresia.socio_id
+    }
+    
+
+
+#ACTUALIZAR MEMBRESIA
+    
+@app.put(/membresias,{membresia_id})
+def actualizar_membresia(membresia_id: int,
+                         mebresia: MembresiaActualizar)
+):
+    conn = sqlite3.conect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        """
+        UPDATE membresias
+        SET tipo = ?,
+        fecha_inicio = ?,
+        fecha_vencimineto = ?,
+        precio = ?,
+        estado = ?,
+        WHERE id = ?
+        """,
+        (
+            membresia.tipo,
+            membresia.fecha_inicio,
+            membresia.fecha_vencimiento,
+            membresia.precio,
+            membresia.estado
+            membresia_id
+        )
+    )
+    
+    conn.commit()
+    
+    if cursor.rowcount == 0:
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Membresia no encontrada"
+        )
+    
+    conn.close()
+    
+    return{
+        "Mensaje": "Membresia actualizada correctamente",
+        "id": membresia_id
+    }
+
+@app.delete("/membresias,{membresia_id}")
+def eliminar_membresia(membresia_id: int):
+    conn = sqlite3.conect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "DELETE FROM membresias WHERE id = ?",
+        (membresia_id,)"
+    )
+    
+    conn.commit()
+    
+    if cursor.rowcount == 0:
+       conn.close()
+    
+       raise HTTPException(
+                            status_code= 404,
+                            detail= "Membresia no encontrada"
+                         )
+    
+    conn.close()
+    
+    return{
+        "Mensaje": "Membresia eliminada correctamente",
+        "id": membresia_id
     }
 

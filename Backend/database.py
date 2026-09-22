@@ -20,11 +20,12 @@ def create_tables():
 
     # Crear tabla de membresías
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS memberships (
+        CREATE TABLE IF NOT EXISTS membresias (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             duracion INTEGER NOT NULL,
-            precio REAL NOT NULL
+            precio REAL NOT NULL,
+            estado INTEGER
         )
     ''')
 
