@@ -176,6 +176,8 @@ def eliminar_socio(socio_id: int):
     
     
 ###PARTE QUE MANEJA LA PARTE DE MEMBRESIAS
+
+#CREAR MEMBRESIA
 class Membresia(BaseModel):
     socio_id: int
     tipo : str
@@ -283,6 +285,8 @@ def actualizar_membresia(membresia_id: int,
         "Mensaje": "Membresia actualizada correctamente",
         "id": membresia_id
     }
+
+#ELIMINAR MEMBRESIA 
 
 @app.delete("/membresias,{membresia_id}")
 def eliminar_membresia(membresia_id: int):
