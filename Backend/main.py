@@ -219,13 +219,15 @@ def crear_membresia(membresia: Membresia):
         )
         VALUES (?,?,?,?,?,?)
         """,
-        (membresia.socio_id,
+        (
+        membresia.socio_id,
         membresia.tipo,
         membresia.fecha_inicio,
         membresia.fecha_vencimiento,
         membresia.precio,
         membresia.estado
         )
+    )
         
     conn.commit()
     
@@ -242,11 +244,18 @@ def crear_membresia(membresia: Membresia):
 
 
 #ACTUALIZAR MEMBRESIA
+class ActualizarMembresia(BaseModel):
+    tipo: str
+    fecha_inicio: str
+    fecha_vencimiento: str
+    precio: float
+    estado : str
     
-@app.put(/membresias,{membresia_id})
-def actualizar_membresia(membresia_id: int,
-                         mebresia: MembresiaActualizar)
-):
+@app.put("/membresias/{membresia_id}")
+def actualizar_membresia(
+    membresia_id: int,
+    membresia: ActualizarMembresia
+    ):
     conn = sqlite3.conect("database.db")
     cursor = conn.cursor()
     
@@ -265,7 +274,7 @@ def actualizar_membresia(membresia_id: int,
             membresia.fecha_inicio,
             membresia.fecha_vencimiento,
             membresia.precio,
-            membresia.estado
+            membresia.estado,
             membresia_id
         )
     )
@@ -288,14 +297,14 @@ def actualizar_membresia(membresia_id: int,
 
 #ELIMINAR MEMBRESIA 
 
-@app.delete("/membresias,{membresia_id}")
+@app.delete("/membresias/{membresia_id}")
 def eliminar_membresia(membresia_id: int):
     conn = sqlite3.conect("database.db")
     cursor = conn.cursor()
     
     cursor.execute(
         "DELETE FROM membresias WHERE id = ?",
-        (membresia_id,)"
+        (membresia_id,)
     )
     
     conn.commit()
