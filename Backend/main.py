@@ -144,3 +144,31 @@ def actualizar_socio(socio_id: int, socio: SocioActualizar):
         "Mensaje": "Socio actualizado correctamente.",
         "id:": socio_id
     }
+
+#Eliminar socio
+@app.delete("/socio/{socio =_id}")
+def eliminar_socio(socio_id: int):
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "DELETE FROM socios WHERE id = ?",
+        (socio_id, )
+        )
+    
+    conn.commit()
+    
+    if cursor.rowcount == 0:
+        conn.close()
+        
+        raise HTTPException(
+            status_code=404,
+            detail=" Socio no encontrado"
+        )
+    conn.close()
+    
+    return {
+        "Mensaje": "Socio eliminado correctamente.",
+        "id": socio_id
+    }
+
