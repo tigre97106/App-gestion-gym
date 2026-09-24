@@ -324,3 +324,90 @@ def eliminar_membresia(membresia_id: int):
         "id": membresia_id
     }
 
+#CRUD de pagos
+
+class Pago(BaseModel):
+    socio_id: int
+    membresia_id: int
+    monto: float
+    fecha_pago: str
+    metodo_pago: str
+
+@app.post("/pagos")
+def crear_pagos(pago: Pago):
+    conn = sqlite3.conect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        """
+        INSERT INTO pagos(
+            socio_id,
+            membresia_id,
+            monto,
+            fecha_pago,
+            metodo_pago
+            )
+            VALUES (?,?,?,?,?)
+            """,
+            (
+                pago.socio_id,
+                pago.membresia_id,
+                pago.monto,
+                pago.fecha_pago,
+                pago.metodo_pago
+            ))
+    conn.commit()
+    
+    pago_id = cursor.lastrowid
+    
+    conn.close()
+    
+    return{
+        "Mensaje": "Pago registrado correctamente",
+        "id": pago_id
+    }
+    
+@app.get("/pagos")
+def obtener_pagos():
+        
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+        
+    cursor.execute(" SELECT * FROM pagos")
+        
+    pagos= cursor.fetchall()
+        
+    conn.close()
+    
+    return [dict(pago) for pago in pagos]
+
+@app.get("/pagos/{pago_id}")
+def obtener_pago(pago_id: int):
+    
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "SELECT FROM pagos WHERE id = ?",
+        (pago_id,)
+    )
+    
+    pago = cursor.fetchone()
+    conn.close()
+    
+    if pago is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Pago no encontrado"
+        )
+        
+    return dict(pago)
+
+
+    
+        
+    
+    
+    
