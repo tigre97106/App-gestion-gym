@@ -324,7 +324,9 @@ def eliminar_membresia(membresia_id: int):
         "id": membresia_id
     }
 
-#CRUD de pagos
+#CRUD DE PAGOS-----------------
+
+#Crear pagos
 
 class Pago(BaseModel):
     socio_id: int
@@ -367,6 +369,8 @@ def crear_pagos(pago: Pago):
         "id": pago_id
     }
     
+#Consultar pagos
+    
 @app.get("/pagos")
 def obtener_pagos():
         
@@ -405,7 +409,90 @@ def obtener_pago(pago_id: int):
         
     return dict(pago)
 
+#Actualizar pagos
 
+class ActualizarPago(BaseModel):
+    socio_id: int
+    membresia_id: int
+    monto: float
+    fecha_pago: str
+    metodo_pago: str
+    
+@app.put("/pagos/{pago_id}")
+def actualizar_pago(
+    pago_id: int,
+    pago: ActualizarPago
+):
+    
+    conn = sqlite3.conect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        """
+        UPDATE pagos
+        SET socio_id = ?,
+        membresia_id = ?,
+        monto = ?,
+        fecha_pago = ?,
+        metodo_pago = ?,
+        WHERE id = ?
+        """,
+        (
+        pago.socio_id,
+        pago.membresia_id,
+        pago.monto,
+        pago.fecha_pago,
+        pago.metodo_pago,
+        pago_id
+        ))
+    
+    conn.commit()
+    
+    if cursor.rowcount == 0:
+        conn.close()
+        
+        raise HTTPException(
+            status_code=404,
+            detail="Pago no encontrado"
+        )
+        
+    conn.close()
+    
+    return {
+        "Mensaje": "Pago actualizado correctamente",
+        "id": pago_id
+    }
+        
+#Borrar pagos
+        
+@app.delete("/pagos/{pago_id}")
+def eliminar_pago(pago_id : int):
+    
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("DELETE FROM pagos WHERE id = ?",
+                   (pago_id)
+    )
+    
+    conn.commit()
+    
+    if cursor.rowcount == 0:
+        conn.close()
+        
+        raise HTTPException(
+            status_code=404,
+            detail="Pago no encontrado"
+        )
+        
+    conn.close()
+    
+    return {
+        "Mensaje": "Pago eliminado correctamente",
+        "id": pago_id
+    }
+    
+    
     
         
     
