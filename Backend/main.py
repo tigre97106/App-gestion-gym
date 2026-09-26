@@ -492,6 +492,52 @@ def eliminar_pago(pago_id : int):
         "id": pago_id
     }
     
+class Asistencia(BaseModel):
+    asistencia_id: int
+    socio_id: int
+    fecha: str
+    hora: str
+    
+    
+@app.post("/asistencias")
+def crear_asistencia (asistencia: Asistencia):
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+                   INSERT INTO asistencias
+                   asistencia_id,
+                   socio_id,
+                   fecha,
+                   hora
+                   )
+                   VALUES (?,?,?,?)
+                   """,
+                   (
+                    asistencia.asistencia_id,
+                    asistencia.socio_id,
+                    asistencia.fecha,
+                    asistencia.hora
+                    
+                   )
+    )
+    conn.commit()
+    
+    asistencia_id = cursor.lastrowid()
+    
+    conn.close()
+    
+    return{
+        "Mensaje": "Asistencia registrada exitosamente",
+        "id": asistencia.asistencia_id
+    }
+    
+    
+    
+    
+    
+    
+    
     
     
         

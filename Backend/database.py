@@ -41,6 +41,16 @@ def create_tables():
             FOREIGN KEY (membership_id) REFERENCES memberships(id)
         )
     ''')
+    
+    cursor.execute("""
+        CREATE TABLE IF NOT EXIST asistencias (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            socio_id INTEGER NOT NULL,
+            fecha TEXT NOT NULL,
+            hora TEXT NOT NULL,
+            FOREIGN KEY (socio_id) REFERENCES socios(id)
+        )
+    """)
 
     conn.commit()
     conn.close()
@@ -48,4 +58,5 @@ def create_tables():
 if __name__ == "__main__":
         create_tables() 
         print("Tablas creadas correctamente en la base de datos.")
+
 
