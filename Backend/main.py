@@ -1,16 +1,24 @@
-#Lenguajes y base de datos
+#LENGUAJES Y BASES DE DATOS
 from fastapi import FastAPI, HTTPException
 from backend.database import create_tables
 from pydantic import BaseModel
 import sqlite3
 
-#Dar acceso a FastAPI con la palabra "app"
+#DAR ACCESO A FASTAPI CON ".APP"
 app = FastAPI()
 
-#Importar modelos de tabla de database.py
+#IMPORTAR MODELO DE DATOS "DATABASE.PY"
 create_tables()
 
-#Estructura de la base de datos
+#TESTEO 
+@app.get("/")
+def inicio():
+    return {"mensaje": "Sistema de gimnasio funcionando correctamente."}
+
+
+###PARTE QUE MANEJA LOS DATOS DE SOCIOS-----------------------
+
+#AGREGAR SOCIO
 class Socio(BaseModel):
     nombre: str
     apellido: str
@@ -18,15 +26,7 @@ class Socio(BaseModel):
     telefono: str | None = None
     mail: str | None = None
     fecha_registro: str
-
-#Testeo de programa 
-@app.get("/")
-def inicio():
-    return {"mensaje": "Sistema de gimnasio funcionando correctamente."}
-
-
-###PARTE QUE MANEJA LOS DATOS DE SOCIOS-----------------------
-#Agregar socio nuevo
+    
 @app.post("/socios")
 def crear_socio(socio: Socio):
     conn = sqlite3.connect("database.db")
@@ -66,7 +66,7 @@ def crear_socio(socio: Socio):
     "id": socio_id
     }
 
-#Consultar socio puntual
+#CONSULTAR SOCIO PUNTUAL
 @app.get("/socios/{socio_id}")
 def obtener_socio(socio_id: int):
     conn = sqlite3.connect("database.db")
@@ -88,7 +88,7 @@ def obtener_socio(socio_id: int):
     
     return dict(socio) 
 
-#Consultar base de datos
+#CONSULTAR SOCIOS
 @app.get("/socios")
 def consultar_datos():
     conn = sqlite3.connect("database.db")
@@ -100,7 +100,7 @@ def consultar_datos():
     conn.close()
     return [dict(socio) for socio in socios]
 
-#Actualizar socio
+#ACTUALIZAR SOCIO
 class SocioActualizar(BaseModel):
     nombre : str
     apellido : str
@@ -147,7 +147,7 @@ def actualizar_socio(socio_id: int, socio: SocioActualizar):
         "id:": socio_id
     }
 
-#Eliminar socio
+#ELIMINAR SOCIO
 @app.delete("/socio/{socio =_id}")
 def eliminar_socio(socio_id: int):
     conn = sqlite3.connect("database.db")
@@ -175,7 +175,7 @@ def eliminar_socio(socio_id: int):
     }
     
     
-###PARTE QUE MANEJA LA PARTE DE MEMBRESIAS
+###PARTE QUE MANEJA LA PARTE DE MEMBRESIAS-------------------
 
 #CREAR MEMBRESIA
 class Membresia(BaseModel):
@@ -206,7 +206,9 @@ def crear_membresia(membresia: Membresia):
             detail= "El socio no existe"
         )
     
-    #Registrar la membresia
+    conn.close()
+    
+
     cursor.execute(
         """
         INSERT INTO membresias(
@@ -241,7 +243,6 @@ def crear_membresia(membresia: Membresia):
         "socio_id": membresia.socio_id
     }
     
-
 
 #ACTUALIZAR MEMBRESIA
 class ActualizarMembresia(BaseModel):
@@ -296,7 +297,6 @@ def actualizar_membresia(
     }
 
 #ELIMINAR MEMBRESIA 
-
 @app.delete("/membresias/{membresia_id}")
 def eliminar_membresia(membresia_id: int):
     conn = sqlite3.conect("database.db")
@@ -324,10 +324,9 @@ def eliminar_membresia(membresia_id: int):
         "id": membresia_id
     }
 
-#CRUD DE PAGOS-----------------
+#CRUD DE PAGOS-------------------------
 
-#Crear pagos
-
+#CREAR PAGOS
 class Pago(BaseModel):
     socio_id: int
     membresia_id: int
@@ -369,8 +368,7 @@ def crear_pagos(pago: Pago):
         "id": pago_id
     }
     
-#Consultar pagos
-    
+#CONSULTAR PAGOS    
 @app.get("/pagos")
 def obtener_pagos():
         
@@ -409,8 +407,7 @@ def obtener_pago(pago_id: int):
         
     return dict(pago)
 
-#Actualizar pagos
-
+#ACTUALIZAR PAGOS
 class ActualizarPago(BaseModel):
     socio_id: int
     membresia_id: int
@@ -463,8 +460,7 @@ def actualizar_pago(
         "id": pago_id
     }
         
-#Borrar pagos
-        
+#ELIMINAR PAGOS        
 @app.delete("/pagos/{pago_id}")
 def eliminar_pago(pago_id : int):
     
@@ -492,13 +488,15 @@ def eliminar_pago(pago_id : int):
         "id": pago_id
     }
     
+#CRUD ASISTENCIAS---------------------------------
+    
+#CREAR ASISTENCIA
 class Asistencia(BaseModel):
     asistencia_id: int
     socio_id: int
     fecha: str
     hora: str
-    
-    
+        
 @app.post("/asistencias")
 def crear_asistencia (asistencia: Asistencia):
     conn = sqlite3.connect("database.db")
@@ -506,20 +504,17 @@ def crear_asistencia (asistencia: Asistencia):
     
     cursor.execute("""
                    INSERT INTO asistencias
-                   asistencia_id,
                    socio_id,
                    fecha,
                    hora
                    )
-                   VALUES (?,?,?,?)
+                   VALUES (?,?,?)
                    """,
                    (
-                    asistencia.asistencia_id,
                     asistencia.socio_id,
                     asistencia.fecha,
                     asistencia.hora
-                    
-                   )
+                    )
     )
     conn.commit()
     
@@ -531,7 +526,77 @@ def crear_asistencia (asistencia: Asistencia):
         "Mensaje": "Asistencia registrada exitosamente",
         "id": asistencia.asistencia_id
     }
+
+#CONSULTAR ASISTENCIAS    
+@app.get("/asistencias")
+def consultar_asistencias():
+    conn = sqlite3.connect*("database.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
     
+    cursor.execute("SELECT * FROM asistencias")
+    asistencias = cursor.fetchall()
+    
+    conn.close()
+    
+    return [dict(asistencia) for asistencia in asistencias ]
+
+
+#CONSULTAR ASISTENCIA INDIVIDUAL  
+@app.get("/asistencias/{asistencia_id}")
+def consultar_asistencia (asistencia_id: int):
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM asistencias WHERE id = ?",
+                   (asistencia_id,)
+                   )
+    
+    asistencia = cursor.fetchone()
+    
+    if asistencia is None:
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Asistencia no encontrada"
+        )
+        
+    conn.close()
+    
+    return dict(asistencia)
+
+
+#ELIMINAR ASISTENCIA
+@app.delete("/asistencias/{asistencia_id}")
+def eliminar_asistencia(asistencia_id: int):
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    cursor.execute("DELETE FROM asistencias WHERE id = ?",
+                   (asistencia_id,)
+    )
+    
+    if cursor.rowcount == 0:
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Asistencia no encontrada"
+        )
+        
+    conn.commit()
+    conn.close()
+    
+    return{
+        "Mensaje": "Asistencia eliminada correctamente",
+        "id": asistencia_id
+    }
+
+
+    
+    
+      
     
     
     

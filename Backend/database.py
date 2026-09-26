@@ -43,7 +43,7 @@ def create_tables():
     ''')
     
     cursor.execute("""
-        CREATE TABLE IF NOT EXIST asistencias (
+        CREATE TABLE IF NOT EXISTS asistencias (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             socio_id INTEGER NOT NULL,
             fecha TEXT NOT NULL,
