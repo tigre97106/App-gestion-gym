@@ -120,7 +120,7 @@ def actualizar_socio(socio_id: int, socio: SocioActualizar):
             apellido = ?,
             edad = ?,
             telefono = ?,
-            mail = ?,
+            mail = ?
         WHERE id = ?
         """,
         (
@@ -148,7 +148,7 @@ def actualizar_socio(socio_id: int, socio: SocioActualizar):
     }
 
 #ELIMINAR SOCIO
-@app.delete("/socio/{socio =_id}")
+@app.delete ("socios/{socio_id}")
 def eliminar_socio(socio_id: int):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
@@ -257,7 +257,7 @@ def actualizar_membresia(
     membresia_id: int,
     membresia: ActualizarMembresia
     ):
-    conn = sqlite3.conect("database.db")
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
     cursor.execute(
@@ -299,7 +299,7 @@ def actualizar_membresia(
 #ELIMINAR MEMBRESIA 
 @app.delete("/membresias/{membresia_id}")
 def eliminar_membresia(membresia_id: int):
-    conn = sqlite3.conect("database.db")
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
     cursor.execute(
@@ -336,7 +336,7 @@ class Pago(BaseModel):
 
 @app.post("/pagos")
 def crear_pagos(pago: Pago):
-    conn = sqlite3.conect("database.db")
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
     cursor.execute(
@@ -421,7 +421,7 @@ def actualizar_pago(
     pago: ActualizarPago
 ):
     
-    conn = sqlite3.conect("database.db")
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
     cursor.execute(
